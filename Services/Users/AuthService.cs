@@ -22,26 +22,32 @@ namespace PetFriends.Services.Users
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JWT _jwt;
         private readonly IWebHostEnvironment _host;
+        private readonly ApplicationDbContext _db;
 
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IWebHostEnvironment host)
+
+        public AuthService(UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, IWebHostEnvironment host, ApplicationDbContext db)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
             _host = host;
+            _db = db;
         }
 
 
 
         public async Task<AuthModel> RegistrationAsync(RegisterModel model)
         {
-
-            var useremail = await _userManager.Users.SingleOrDefaultAsync(x => x.Email == model.Email);
-            var username = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == model.Username);
-
-
-            if (useremail != null && username != null)
+            var userEmail = await _db.Users.SingleOrDefaultAsync(x=>x.Email.ToLower() == model.Email.ToLower());
+            if (userEmail  != null)
                 return new AuthModel { Message = "Email or UserName is already registered!" };
+
+            if (await _userManager.FindByNameAsync(model.Username) is not null)
+                return new AuthModel { Message = "Email or UserName is already registered!" };
+
+
+            //if (useremail != null && username != null)
+            //    return new AuthModel { Message = "Email or UserName is already registered!" };
 
 
 

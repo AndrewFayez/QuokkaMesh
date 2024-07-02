@@ -45,11 +45,7 @@ namespace QuokkaMesh.Controllers.User
             var result = await _authService.RegistrationAsync(model);
 
             if (!result.IsAuthenticated)
-                return BadRequest(new { Messages = "Email or UserName is already registered! " });
-
-
-            if (!string.IsNullOrEmpty(result.RefreshToken))
-                SetRefreshTokenInCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                return BadRequest(new { Messages = $"{result.Message}" });
 
             return Ok(new { result });
         }
@@ -66,9 +62,6 @@ namespace QuokkaMesh.Controllers.User
 
             if (!result.IsAuthenticated)
                 return BadRequest(new { Messages = result.Message });
-
-            if (!string.IsNullOrEmpty(result.RefreshToken))
-                SetRefreshTokenInCookie(result.RefreshToken, result.RefreshTokenExpiration);
 
             return Ok(new { result });
         }

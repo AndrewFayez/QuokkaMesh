@@ -15,7 +15,7 @@ namespace QuokkaMesh.Services.Users
          Task<AuthModel> GetTokenAsync(TokenRequestModel model);
 
 
-        public  Task<IActionResult> UpdateSubProfile([FromRoute] string id, [FromBody] RegisterModel patch);
+        public  Task<Messages> UpdateSubProfile([FromRoute] string id, [FromBody] RegisterModel patch);
 
 
         Task<AuthModel> RefreshTokenAsync(string token);

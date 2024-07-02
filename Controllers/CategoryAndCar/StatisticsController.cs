@@ -33,7 +33,8 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
                     x.UserName,
                     x.Email,
                     x.DateTime,
-                    x.CountPoint
+                    x.CountPoint,
+                    x.ImageCover
                 }).OrderByDescending(x=>x.CountPoint).ToListAsync();
             return Ok(new { user });
         }

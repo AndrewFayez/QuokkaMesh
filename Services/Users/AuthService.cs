@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using QuokkaMesh.Helpers;
 using QuokkaMesh.Models.Data;
+using QuokkaMesh.Models.DataModel.OTPModel;
 using QuokkaMesh.Models.DataModel.TokenDataModel;
 using QuokkaMesh.Models.DataModels.CartCategory.CartCategoryDTO;
 using QuokkaMesh.Models.DataModels.UserModel;
@@ -115,12 +116,12 @@ namespace PetFriends.Services.Users
 
 
 
-        public async Task<IActionResult> UpdateSubProfile([FromRoute] string id, [FromBody] RegisterModel prof)
+        public async Task<Messages> UpdateSubProfile([FromRoute] string id, [FromBody] RegisterModel prof)
         {
             var c = await _userManager.Users.SingleOrDefaultAsync(x => x.Id == id);
             if (c == null)
             {
-                return Ok(new { Message = $"Client Id {id} Not Exists"});
+                return new Messages { Message = $"Client Id {id} Not Exists" };
             }
 
 
@@ -162,6 +163,7 @@ namespace PetFriends.Services.Users
                 c.Email = c.Email;
             else
                 c.Email = prof.Email;
+
             if (prof.Phonenumber == null)
                 c.PhoneNumber = c.PhoneNumber;
             else
@@ -171,9 +173,10 @@ namespace PetFriends.Services.Users
 
           
           
-            await _userManager.UpdateAsync(c);
+             _db.Users.Update(c);
+            _db.SaveChanges();
 
-            return Ok(new { Message = $"{c.FullName}" });
+            return new Messages { Message = $"{c.FullName}" };
 
 
         }

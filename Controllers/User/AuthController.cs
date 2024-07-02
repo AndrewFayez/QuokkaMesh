@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuokkaMesh.Models.Data;
+using QuokkaMesh.Models.DataModel.OTPModel;
 using QuokkaMesh.Models.DataModel.TokenDataModel;
 using QuokkaMesh.Models.DataModels.UserModel;
 using QuokkaMesh.Services.Email;
@@ -76,7 +77,8 @@ namespace QuokkaMesh.Controllers.User
 
 
             var result = await _authService.UpdateSubProfile(id, patch);
-            return Ok(new { result });
+
+            return Ok( result );
         }
 
 

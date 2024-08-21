@@ -40,6 +40,24 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
         }
 
 
+        [HttpGet("Admin/GetOneUser")]
+        public async Task<IActionResult> GetOneUser(string userId)
+        {
+
+            var user = await _userManager.Users.Where(x=>x.Id == userId).Select(x => new
+            {
+                x.Id,
+                x.FullName,
+                x.PhoneNumber,
+                x.UserName,
+                x.Email,
+                x.DateTime,
+                x.CountPoint,
+                x.ImageCover
+            }).ToListAsync();
+            return Ok(new { user });
+        }
+
 
 
 

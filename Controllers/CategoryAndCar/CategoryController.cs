@@ -141,7 +141,7 @@ namespace QuokkaMesh.Controllers.Category
 
 
         [HttpDelete("Admin/DeleteCategory")]
-        public async Task<IActionResult> DeleteCategory([FromForm] int id)
+        public async Task<IActionResult> DeleteCategory( int id)
         {
             var category = await _db.Categories.SingleOrDefaultAsync(x => x.Id == id);
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuokkaMesh.Models.Data;
 
@@ -11,9 +12,11 @@ using QuokkaMesh.Models.Data;
 namespace QuokkaMesh.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716081913_IsAdmin")]
+    partial class IsAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,116 +402,6 @@ namespace QuokkaMesh.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ReciverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.News.NewsModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("News");
-                });
-
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.Notify.NotificationModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.SendMessageRequestModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FromUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ToUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SendMessageRequestModel");
-                });
-
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.UserMessage", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MessageId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "MessageId");
-
-                    b.HasIndex("MessageId");
-
-                    b.ToTable("UserMessages");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -642,30 +535,9 @@ namespace QuokkaMesh.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.UserMessage", b =>
-                {
-                    b.HasOne("QuokkaMesh.Models.DataModels.Message", "Messages")
-                        .WithMany("UserMessage")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("QuokkaMesh.Models.Data.ApplicationUser", "User")
-                        .WithMany("UserMessage")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Messages");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("QuokkaMesh.Models.Data.ApplicationUser", b =>
                 {
                     b.Navigation("UserCart");
-
-                    b.Navigation("UserMessage");
                 });
 
             modelBuilder.Entity("QuokkaMesh.Models.DataModels.CartCategory.Cart.CartModel", b =>
@@ -683,11 +555,6 @@ namespace QuokkaMesh.Migrations
             modelBuilder.Entity("QuokkaMesh.Models.DataModels.CartCategory.Category.CategoryModel", b =>
                 {
                     b.Navigation("CategoryCart");
-                });
-
-            modelBuilder.Entity("QuokkaMesh.Models.DataModels.Message", b =>
-                {
-                    b.Navigation("UserMessage");
                 });
 #pragma warning restore 612, 618
         }

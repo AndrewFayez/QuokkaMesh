@@ -11,7 +11,7 @@
 
         public string? Phonenumber { get; set; }
 
-
+        public bool? IsAdmin { get; set; } = false;
 
         public IFormFile? ImageCover { get; set; }
 

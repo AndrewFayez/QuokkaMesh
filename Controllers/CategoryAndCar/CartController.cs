@@ -217,9 +217,9 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
 
 
         [HttpDelete("Admin/DeleteCart")]
-        public async Task<IActionResult> DeleteCart([FromForm] int id)
+        public async Task<IActionResult> DeleteCart( int CartId)
         {
-            var cart = await _db.Cart.SingleOrDefaultAsync(x => x.Id == id);
+            var cart = await _db.Cart.SingleOrDefaultAsync(x => x.Id == CartId);
 
 
             if (cart == null)
@@ -227,10 +227,42 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
                 return BadRequest(new { Message = "Cart Is Not Exist." });
             }
 
-            cart.IsActive = false;
-          
-            _db.Cart.Update(cart);
+            ////////////// CartUser 
+            var cartId = _db.CartAndUserCart
+              .Where(x => x.CartId == CartId)
+              .Select(x => x.UserCartId);
+
+            var finCart = await _db.CartAndUserCart
+               .SingleOrDefaultAsync(x => x.CartId == CartId && cartId.Contains(x.UserCartId));
+
+            if (finCart == null)
+            {
+                return NotFound();
+            }
+            //////////////////////CategoryCart
+
+            var categId = _db.CategoryCart
+              .Where(x => x.CartId == CartId)
+              .Select(x => x.CategoryId);
+
+            var finCategory = await _db.CategoryCart
+               .SingleOrDefaultAsync(x => x.CartId == CartId && categId.Contains(x.CategoryId));
+
+            if (finCategory == null)
+            {
+                return NotFound();
+            }
+
+            _db.CategoryCart.Remove(finCategory);
             _db.SaveChanges();
+
+            _db.CartAndUserCart.Remove(finCart);
+            _db.SaveChanges();
+
+            _db.Cart.Remove(cart);
+            await _db.SaveChangesAsync();
+
+
             return Ok(new
             {
                 Messages = "Send Succesfully",

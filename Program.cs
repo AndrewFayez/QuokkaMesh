@@ -1,16 +1,22 @@
 
 
+using ChatWebAPI.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using PetFriends.Services.Users;
 using QuokkaMesh.Helpers;
+using QuokkaMesh.Hubs;
 using QuokkaMesh.Models.Data;
+using QuokkaMesh.NotifyForUser;
 using QuokkaMesh.Services.Email;
 using QuokkaMesh.Services.Users;
 using System.Text;
+
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +32,18 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFramework
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+
+
+builder.Services.AddSignalR();
+builder.Services.AddCors(options => {
+    options.AddPolicy("CORSPolicy", builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed((hosts) => true));
+});
+
+builder.Services.AddScoped<ChatWebAPI.Hubs.UserManager, ChatWebAPI.Hubs.UserManager>();
+
+
+ builder.Services.AddScoped<Hub<IMessageHubClient>, MessageHub>();
 
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();
@@ -84,10 +102,26 @@ app.UseFileServer(new FileServerOptions
 });
 
 
+
 app.UseHttpsRedirection();
+
+//////////////////////// For Web
+app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowAll");
+////////////////////////
+
 
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();
+
+app.UseRouting();
+
+app.UseEndpoints(routes =>
+{
+    routes.MapHub<ChatHub>("/chatHub");
+      routes.MapHub<MessageHub>("/notification");
+    //routes.MapHub<NotificationUserHub>("/ NotificationHub");
+});
 
 app.Run();

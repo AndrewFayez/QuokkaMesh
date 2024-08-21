@@ -69,6 +69,41 @@ namespace QuokkaMesh.Controllers.User
 
 
 
+
+        [HttpPut("IsAdmin/AddAdmin/{userId}")]
+        public async Task<IActionResult> AddAdmin(string userId)
+        {
+
+            var Ads = await _db.Users.SingleOrDefaultAsync(x => x.Id == userId);
+            if (Ads == null)
+            {
+                return NotFound(new { Messages = $"User Id {userId} Not Exists Or IsAdmin" });
+            }
+
+            if (Ads.IsAdmin == false)
+                Ads.IsAdmin = true;
+
+
+            _db.Users.Update(Ads);
+            _db.SaveChanges();
+
+
+            return Ok(
+                new
+                {
+                    Ads.Id,
+                    Ads.FullName,
+                    Ads.PhoneNumber,
+                    Ads.UserName,
+                    Ads.Email,
+                    Ads.DateTime,
+                    Ads.IsAdmin,
+                });
+
+        }
+
+
+
         [HttpPut("UpdateSubProfile/{id}")]
         public async Task<IActionResult> UpdateSubProfil([FromRoute] string id, [FromForm] RegisterModel patch)
         {
@@ -162,6 +197,50 @@ namespace QuokkaMesh.Controllers.User
 
             return Ok(new { Message = "Password Is Updated!" });
         }
+
+
+
+
+        [HttpGet("GetAllUser")]
+        public async Task<IActionResult> GetAllUser()
+        {
+
+            var user = await _db.Users
+                .Select(x => new
+                {
+                    x.Id,
+                    x.FullName,
+                    x.PhoneNumber,
+                    x.UserName,
+                    x.Email,
+                    x.DateTime,
+                    x.IsAdmin,
+                    x.ImageCover,
+                }).ToListAsync();
+            return Ok(user);
+        }
+
+
+
+        [HttpGet("GetOneUser")]
+        public async Task<IActionResult> GetOneUser(string userId)
+        {
+
+            var user = await _db.Users.Where(x => x.Id == userId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.FullName,
+                    x.PhoneNumber,
+                    x.UserName,
+                    x.Email,
+                    x.DateTime,
+                    x.ImageCover,
+                    x.IsAdmin,
+                }).ToListAsync();
+            return Ok(user);
+        }
+
 
     }
 }

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PetFriends.Services.Users;
 using QuokkaMesh.Models.Data;
 using QuokkaMesh.Models.DataModels.CartCategory.Cart;
 using QuokkaMesh.Models.DataModels.CartCategory.CartCategoryDTO;
+using QuokkaMesh.Services.Users;
 
 namespace QuokkaMesh.Controllers.CategoryAndCar
 {
@@ -30,15 +30,14 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
 
 
         [HttpPost("User/SendCart")]
-        public async Task<IActionResult> SendCart(string SenderToken , string ReceiverId , int cartId, [FromForm] UserCartDTO userCart)
+        public async Task<IActionResult> SendCart(string userId , string ReceiverId , int cartId, [FromForm] UserCartDTO userCart)
         {
-            var principal = _tokenGenerate.DecodeToken(SenderToken);
-           var userIdClaim = principal.Claims.First(x => x.Type == "uid").Value;
-            var sender = _db.Users.FirstOrDefault(x=>x.Id == userIdClaim);
+            
+            var sender =await _db.Users.FindAsync( userId);
 
-            if (userIdClaim == null)
+            if (sender == null)
             {
-                return BadRequest(new { Messages = "Please Login." });
+                return BadRequest(new { Messages = " User Not Found." });
             }
 
             var cart = await _db.Cart.FindAsync(cartId);
@@ -57,7 +56,7 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
                         Receiver = userCart.Receiver,
                         Sender = userCart.Sender,
                         ReceiverId = ReceiverId,
-                        SenderId = userIdClaim,
+                        SenderId = userId,
                         Content = userCart.Content,
                         Created = userCart.Created,
                         Titel = userCart.Titel,
@@ -70,7 +69,7 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
                     _db.SaveChanges();
 
 
-                    var countPointpre = await _db.Users.SingleOrDefaultAsync(x => x.Id == userIdClaim);
+                    var countPointpre = await _db.Users.SingleOrDefaultAsync(x => x.Id == userId);
                     countPointpre.CountPoint = countPointpre.CountPoint + cart.NumberOfPoint;
                     _db.Users.Update(countPointpre);
 
@@ -99,7 +98,7 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
                 Receiver = userCart.Receiver,
                 Sender = userCart.Sender,
                 ReceiverId = ReceiverId,
-                SenderId = userIdClaim,
+                SenderId = userId,
                 Content = userCart.Content, 
                 Created = userCart.Created,
                 Titel = userCart.Titel,
@@ -112,7 +111,7 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
             _db.SaveChanges();
 
 
-            var countPoint = await _db.Users.SingleOrDefaultAsync(x => x.Id == userIdClaim);
+            var countPoint = await _db.Users.SingleOrDefaultAsync(x => x.Id == userId);
             countPoint.CountPoint = countPoint.CountPoint + cart.NumberOfPoint;
             _db.Users.Update(countPoint);
 
@@ -137,13 +136,12 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
 
 
         [HttpGet("User/ViewMyCartsended")]
-        public async Task<IActionResult> ViewMyCartsended(string userToken)
+        public async Task<IActionResult> ViewMyCartsended(string userId)
         {
-            var principal = _tokenGenerate.DecodeToken(userToken);
-            var userIdClaim = principal.Claims.First(x => x.Type == "uid").Value;
-            var sender = _db.Users.FirstOrDefault(x => x.Id == userIdClaim);
+            
+            var sender = _db.Users.FirstOrDefault(x => x.Id == userId);
 
-            if (userIdClaim == null)
+            if (sender == null)
             {
                 return BadRequest(new { Messages = "Please Login." });
             }
@@ -173,13 +171,12 @@ namespace QuokkaMesh.Controllers.CategoryAndCar
 
 
         [HttpGet("User/ViewMyCartrecevied")]
-        public async Task<IActionResult> ViewMyCartrecevied(string userToken)
+        public async Task<IActionResult> ViewMyCartrecevied(string userId)
         {
-            var principal = _tokenGenerate.DecodeToken(userToken);
-            var userIdClaim = principal.Claims.First(x => x.Type == "uid").Value;
-            var sender = _db.Users.FirstOrDefault(x => x.Id == userIdClaim);
+            
+            var sender = _db.Users.FirstOrDefault(x => x.Id == userId);
 
-            if (userIdClaim == null)
+            if (sender == null)
             {
                 return BadRequest(new { Messages = "Please Login." });
             }

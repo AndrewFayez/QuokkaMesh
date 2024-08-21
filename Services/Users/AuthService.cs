@@ -15,7 +15,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PetFriends.Services.Users
+namespace QuokkaMesh.Services.Users
 {
     public class AuthService : ControllerBase, IAuthService
     {
@@ -74,6 +74,7 @@ namespace PetFriends.Services.Users
                 Email = model.Email.ToLower(),
                 ImageCover = path1,
                 DateTime = DateTime.Now,
+                IsAdmin = false,
  
             };
 
@@ -108,7 +109,9 @@ namespace PetFriends.Services.Users
                 Username = user.UserName,
                 RefreshToken = refreshToken.Token,
                 RefreshTokenExpiration = refreshToken.ExpiresOn,
-                Id=user.Id
+                Id=user.Id,
+                IsAdmin = (bool)user.IsAdmin
+
             };
             
            
@@ -206,6 +209,8 @@ namespace PetFriends.Services.Users
             authModel.Username = user.UserName;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Id = user.Id;
+            authModel.IsAdmin = (bool)user.IsAdmin;
+
 
             if (user.RefreshTokens.Any(t => t.IsActive))
             {
@@ -308,9 +313,10 @@ namespace PetFriends.Services.Users
             authModel.IsAuthenticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             authModel.Email = user.Email;
-            authModel.Username = user.UserName
-                
-                ;
+            authModel.Username = user.UserName;
+            authModel.IsAdmin = (bool)user.IsAdmin;
+
+        
             var roles = await _userManager.GetRolesAsync(user);
             authModel.RefreshToken = newRefreshToken.Token;
             authModel.RefreshTokenExpiration = newRefreshToken.ExpiresOn;

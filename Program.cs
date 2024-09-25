@@ -29,6 +29,18 @@ op.UseSqlServer(builder.Configuration.GetConnectionString("myCon"))
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 
+builder.Services.AddIdentityCore<ApplicationUser>(options => builder.Configuration.GetSection(nameof(IdentityOptions)).Bind(options));
+//builder.Services.Configure<IdentityOptions>(options =>
+//{
+//    // Default Password settings.
+//    options.Password.RequireDigit = true;
+//    options.Password.RequireLowercase = true;
+//    options.Password.RequireUppercase = true;
+//    options.Password.RequiredLength = 9;
+//});
+
+
+
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -37,7 +49,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddCors(options => {
-    options.AddPolicy("CORSPolicy", builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed((hosts) => true));
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+        .SetIsOriginAllowed((hosts) => true));
 });
 
 builder.Services.AddScoped<ChatWebAPI.Hubs.UserManager, ChatWebAPI.Hubs.UserManager>();

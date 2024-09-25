@@ -242,5 +242,30 @@ namespace QuokkaMesh.Controllers.User
         }
 
 
+
+
+
+        [HttpDelete("DeleteUser")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+
+            var user = await _db.Users
+         .Include(u => u.UserCart)
+         .Include(u => u.UserMessage)
+         .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _db.UserCart.RemoveRange(user.UserCart);
+            _db.UserMessages.RemoveRange(user.UserMessage);
+            _db.Users.Remove(user);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+
     }
 }
